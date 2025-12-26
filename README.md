@@ -10,7 +10,10 @@ First of input contains: size of board and number of turns (separated by single 
 
 Next line contain single number `p` - number of players in the game, including you.
 
-Next `p` lines contains positions of players bases in format `row col` (two integers sep by space)
+Next `p` lines contains positions of players bases in format `row col` (two integers sep by space).
+First of those lines is postion of your base.
+
+Note: `row col` are zero indexed.
 
 Then game starts.
 
@@ -24,7 +27,7 @@ The next `a` lines contains info about agnets in following format:
 - `dist` (intteger) is distance to that object (of type `TYPE`)
 - `ROTATION` is single character: `U`, `R`, `D` or `L` (rotation of agent)
 
-Your task is print `p` lines on stdout conating information about agent actions. For each agent print single word:
+Your task is print `a` lines on stdout conating information about agent actions. For each agent print single word:
 - `GO`
 - `FIRE`
 - `MINE`
