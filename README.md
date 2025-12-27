@@ -1,5 +1,20 @@
 # grush
 
+### Usage
+
+Compile arena program (requires c++20)
+```bash
+make -C src/
+make -C example/
+```
+
+Running arena program
+```bash
+./src/arena ./example/bot ./example/bot.py
+```
+
+### Info
+
 Your program reads input from standard input (normally "the keyboard") and writes output to standard output (normally "the screen"). Your program is started once at the beginning of a game and keeps running until the end of the game.
 
 You should strictly follow the dialogue described in the game rules. You may assume that all input to your program is completely correct.
