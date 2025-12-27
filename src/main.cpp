@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
   for (int it = 0; it < ITER; it++) {
     system("sleep 0.01");
     std::cout << it << " ITER" << std::endl;
+    system("clear");
     std::cout << grush.to_string() << std::endl;
     grush.update_vision();
 
