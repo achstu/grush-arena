@@ -2,7 +2,7 @@
 
 ### Contestants
 
-- https://github.com/mastach/grush
+- https://github.com/mastach/grush_clash
 - https://github.com/opprotossball/GRush-Crusher
 
 ### Usage
