@@ -10,6 +10,7 @@ struct Bot {
   bp::ipstream out;
   bp::child c;
   std::string command;
+  std::string name;
 
   Bot(const std::string &);
   ~Bot();

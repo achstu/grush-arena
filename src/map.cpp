@@ -58,7 +58,7 @@ void Grush::update() {
   }
   // remove killed zombie-agents from game
   for (auto &player : players) {
-    for (auto& agent : player.alive_agents()) {
+    for (auto &agent : player.alive_agents()) {
       if (agent.is_zombie) {
         auto [r, c] = agent.position;
         agents_ptr[r][c] = nullptr;
@@ -172,32 +172,45 @@ std::string Grush::to_string(const GameStats &stats) const {
       "\033[0;42m", // green
       "\033[0;44m", // blue
       "\033[0;45m", // magenta
+      "\033[0;46m", // cyan
   };
   const static std::string colors_fg[] = {
       "\033[0;31m", // red
       "\033[0;32m", // green
       "\033[0;34m", // blue
       "\033[0;35m", // magenta
+      "\033[0;36m", // cyan
   };
 
-  const static std::string color_names[] = {"red", "green", "blue", "magenta"};
+  const static std::string color_names[] = {"red", "green", "blue", "magenta", "cyan"};
 
   const static std::string reset = "\033[0m";
   const static std::string bold = "\033[1m";
+  const static std::string black_fg = "\033[0;31m";
   const static std::string gold_color = "\033[0;43m"; // yellow
   const static std::string wall_color = "\033[0;47m"; // white
 
   std::ostringstream ss;
   for (int row = 0; row < N; row++) {
     for (int col = 0; col < N; col++) {
-      if (square[row][col] == BLOCK)
-        ss << wall_color;
-      else if (agents_ptr[row][col] != nullptr)
-        ss << colors[agents_ptr[row][col]->owner];
-      else if (gold[row][col] > 0)
-        ss << gold_color;
+      if (square[row][col] == BLOCK) {
 
-      ss << "  " << reset;
+        ss << wall_color << "  " << reset;
+
+      } else if (agents_ptr[row][col] != nullptr) {
+        Agent *a = agents_ptr[row][col];
+        
+        ss << colors[a->owner];
+        ss << bold;
+        ss << (a->has_gold ? "**" : "  ");
+        ss << reset;
+
+      } else if (gold[row][col] > 0) {
+
+        ss << gold_color << "  " << reset;
+      } else {
+        ss << "  ";
+      }
     }
 
     if (row == 0 && stats.size() == players.size()) {
@@ -210,8 +223,8 @@ std::string Grush::to_string(const GameStats &stats) const {
       ss << reset;
     }
 
-    else if (stats.size() == players.size() && row-1 < (int)players.size()) {
-      int p = row-1;
+    else if (stats.size() == players.size() && row - 1 < (int)players.size()) {
+      int p = row - 1;
 
       ss << "\t";
       ss << bold << colors_fg[p] << color_names[p] << reset << "\t\t";

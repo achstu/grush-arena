@@ -12,8 +12,12 @@ using namespace std;
 
 
 int main() {
-  vector<string> actions = {"FIRE", "GO", "MINE", "LEFT", "RIGHT", "BACK"};
+  cout << "random" << endl;
+
+  
+  // vector<string> actions = {"FIRE", "GO", "MINE", "LEFT", "RIGHT", "BACK"};
   // vector<string> actions = {"GO", "GO", "GO", "LEFT", "RIGHT", "BACK"};
+  vector<string> actions = {"GO", "GO", "GO", "MINE", "MINE", "MINE", "LEFT", "RIGHT", "BACK"};
   random_device rd;
   mt19937 g(rd());
 

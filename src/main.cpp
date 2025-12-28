@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
     Player &player = grush.players[p];
     Bot &bot = bots[p];
 
+    std::getline(bot.out, bot.name);
+
     bot.in << N << " " << ITER << "\n";
     bot.in << players << "\n";
     bot.in << player.base.to_string() << "\n";
@@ -90,7 +92,7 @@ int main(int argc, char *argv[]) {
         auto [r, c] = player.base;
         size_t time = duration.count();
         stats.emplace_back(time, grush.gold[r][c],
-                           (int)player.alive_agents_count(), "unknown");
+                           (int)player.alive_agents_count(), bot.name);
       }
     }
 
