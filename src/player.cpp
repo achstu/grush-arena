@@ -2,6 +2,7 @@
 
 #include <format>
 #include <string>
+#include <ranges>
 
 bool Position::operator==(const Position &other) const {
   return (row == other.row) && (col == other.col);
@@ -26,8 +27,8 @@ Vision::Vision(int d, VisualObject o, Agent *ptr)
     : distance(d), object(o), agent_ptr(ptr) {}
 
 Agent::Agent(Position p, Orientation o, int owning_player)
-    : vision(0, WALL, nullptr), position(p), orientation(o),
-      holding_gold(false), zombie(false), action(MINE), owner(owning_player) {}
+    : vision(0, WALL, nullptr), position(p), orientation(o), has_gold(false),
+      is_zombie(false), is_alive(true), action(MINE), owner(owning_player) {}
 
 std::string Agent::describe() const {
   auto vision_to_string = [](VisualObject vo) {
@@ -51,8 +52,18 @@ std::string Agent::describe() const {
 
   return std::format("{} {} {} {} {}", position.to_string(),
                      vision_to_string(vision.object), vision.distance,
-                     orientation_to_string(orientation), int(holding_gold));
+                     orientation_to_string(orientation), int(has_gold));
 }
 
 Player::Player(Position b, std::vector<Agent> &&a)
     : base(b), agents(std::move(a)) {}
+
+// static inline bool is_alive(const Agent &a) { return a.is_alive; }
+
+// auto Player::alive_agents() -> decltype(auto) {
+  // return std::ranges::filter_view(agents, is_alive);
+// }
+
+// auto Player::alive_agents() const -> decltype(auto) {
+  // return std::ranges::filter_view(agents, is_alive);
+// }

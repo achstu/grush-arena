@@ -30,28 +30,18 @@ Grush::Grush() {
   }
 
   // init agents
-  players = {};
+  // players = {};
 }
 
 void Grush::update() {
-  // assert(turns.size() == players.size());
-
-  // save input in agents
-  // for (int p = 0; p < players.size(); p++) {
-  // assert(players[p].agents.size() == turns[p].size());
-
-  // for (int i = 0; i < turns[p].size(); i++) {
-  // players[p].agents[i].action = turns[p][i];
-  // }
-  // }
-
+  // check for invariants
   for (int row = 0; row < N; row++) {
     for (int col = 0; col < N; col++) {
       assert(congestation[row][col] == 0);
     }
   }
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       auto [r, c] = agent.position;
       // assert(agents_ptr[r][c] != nullptr);
       assert(agents_ptr[r][c] == &agent);
@@ -60,24 +50,20 @@ void Grush::update() {
 
   // mark zombie agents
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       if (agent.action == FIRE && agent.vision.agent_ptr != nullptr) {
-        agent.vision.agent_ptr->zombie = true;
+        agent.vision.agent_ptr->is_zombie = true;
       }
     }
   }
   // remove killed zombie-agents from game
   for (auto &player : players) {
-    std::vector<Agent> &agents = player.agents;
-    for (int i = agents.size() - 1; i >= 0; i--) {
-      auto [r, c] = agents[i].position;
-      if (agents[i].zombie) {
+    for (auto& agent : player.alive_agents()) {
+      if (agent.is_zombie) {
+        auto [r, c] = agent.position;
         agents_ptr[r][c] = nullptr;
-        gold[r][c] += agents[i].holding_gold;
-
-        // remove from vector
-        std::swap(agents[i], agents.back());
-        agents.pop_back();
+        gold[r][c] += agent.has_gold;
+        agent.is_alive = false;
       }
     }
   }
@@ -85,7 +71,7 @@ void Grush::update() {
   // resolve rotations (LEFT, RIGHT, BACK)
   // PERF: this can be done in the first loop
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       // note: if action is other than specified above
       //       then identity rotation will be applied
       agent.orientation =
@@ -96,7 +82,7 @@ void Grush::update() {
   // mark targets squares (GO)
   // PERF: this also can be done in initial loop
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       if (agent.action == GO) {
         auto [tr, tc] = agent.position.advance(agent.orientation);
         congestation[tr][tc] += 1;
@@ -105,7 +91,7 @@ void Grush::update() {
   }
   // resolve movement, move agents
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       auto [r, c] = agent.position;
       auto [tr, tc] = agent.position.advance(agent.orientation);
       if (agent.action == GO && agents_ptr[tr][tc] == nullptr &&
@@ -125,22 +111,22 @@ void Grush::update() {
   // resolve MINE action
   // PERF: also can be done in initial loop
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       auto [r, c] = agent.position;
-      if (agent.action == MINE && gold[r][c] > 0 && !agent.holding_gold) {
+      if (agent.action == MINE && gold[r][c] > 0 && !agent.has_gold) {
         gold[r][c]--;
-        agent.holding_gold = true;
+        agent.has_gold = true;
       }
     }
   }
 
   // put gold in home base
   for (auto &player : players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       if (agent.position == player.base) {
         auto [r, c] = agent.position;
-        gold[r][c] += agent.holding_gold;
-        agent.holding_gold = false;
+        gold[r][c] += agent.has_gold;
+        agent.has_gold = false;
       }
     }
   }
@@ -173,8 +159,8 @@ Vision Grush::calculate_vision(int player, Position pos, Orientation o) {
 }
 
 void Grush::update_vision() {
-  for (int p = 0; p < players.size(); p++) {
-    for (auto &agent : players[p].agents) {
+  for (int p = 0; p < (int)players.size(); p++) {
+    for (auto &agent : players[p].alive_agents()) {
       agent.vision = calculate_vision(p, agent.position, agent.orientation);
     }
   }
@@ -296,14 +282,14 @@ Grush Grush::semi_random(int num_players, int num_agents) {
       Agent agent(find_position(bases[p]), U, p);
       auto [r, c] = agent.position;
       occupied[r][c] = true;
-      agents.push_back(agent);
+      agents.push_back(std::move(agent));
     }
 
     grush.players.emplace_back(bases[p], std::move(agents));
   }
 
   for (auto &player : grush.players) {
-    for (auto &agent : player.agents) {
+    for (auto &agent : player.alive_agents()) {
       auto [r, c] = agent.position;
       grush.agents_ptr[r][c] = &agent;
     }

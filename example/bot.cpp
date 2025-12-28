@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-#if true
+#if 1
 #define debug(...) {};
 #else
 #include "debug.hpp"
@@ -12,8 +12,8 @@ using namespace std;
 
 
 int main() {
-  // vector<string> actions = {"FIRE", "GO", "MINE", "LEFT", "RIGHT", "BACK"};
-  vector<string> actions = {"GO", "GO", "GO", "LEFT", "RIGHT", "BACK"};
+  vector<string> actions = {"FIRE", "GO", "MINE", "LEFT", "RIGHT", "BACK"};
+  // vector<string> actions = {"GO", "GO", "GO", "LEFT", "RIGHT", "BACK"};
   random_device rd;
   mt19937 g(rd());
 
