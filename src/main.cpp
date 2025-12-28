@@ -1,5 +1,5 @@
-#include "map.hpp"
 #include "bot.hpp"
+#include "map.hpp"
 #include "stats.hpp"
 
 #include <chrono>
@@ -7,7 +7,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
 
 int main(int argc, char *argv[]) {
 
@@ -45,7 +44,6 @@ int main(int argc, char *argv[]) {
       bot.in << grush.players[i].base.to_string() + "\n";
     }
   }
-
 
   // print initial position
   std::cout << "INITIAL POSITION" << std::endl;
@@ -90,17 +88,18 @@ int main(int argc, char *argv[]) {
       {
         auto [r, c] = player.base;
         size_t time = duration.count();
-        stats.push_back(
-            PlayerStats(time, grush.gold[r][c], (int)player.agents.size(), bot.command));
+        stats.emplace_back(time, grush.gold[r][c], (int)player.agents.size(),
+                           "unknown");
       }
     }
 
     grush.update();
 
     // print game state
+    if (it < ITER - 1)
+      system("clear");
     std::cout << it << " ITER" << std::endl;
     std::cout << grush.to_string(stats) << std::endl;
     system("sleep 0.01");
-    if (it < ITER - 1) system("clear");
   }
 }
