@@ -40,8 +40,9 @@ int main() {
       string type;
       int dist;
       char rot;
-      cin >> row >> col >> type >> dist >> rot;
-      debug(row, col, type, dist, rot);
+      bool has_gold;
+      cin >> row >> col >> type >> dist >> rot >> has_gold;
+      debug(row, col, type, dist, rot, has_gold);
     }
 
     for (int i = 0; i < agents; i++) {

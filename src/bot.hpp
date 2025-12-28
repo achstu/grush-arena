@@ -3,12 +3,13 @@
 #include <boost/process.hpp>
 #include <string>
 
-// namespace bp = boost::process;
+namespace bp = boost::process;
 
 struct Bot {
-  boost::process::opstream in;
-  boost::process::ipstream out;
-  boost::process::child c;
+  bp::opstream in;
+  bp::ipstream out;
+  bp::child c;
+  std::string command;
 
   Bot(const std::string &);
   ~Bot();

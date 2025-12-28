@@ -1,6 +1,7 @@
 #include "map.hpp"
-// #include "process.hpp"
 #include "bot.hpp"
+#include "stats.hpp"
+
 #include <chrono>
 #include <format>
 #include <iostream>
@@ -24,16 +25,16 @@ int main(int argc, char *argv[]) {
     }
     Bot bot(command);
     bots.push_back(std::move(bot));
-    std::cout << p << ": " << command << "\n";
+    // std::cout << p << ": " << command << "\n";
   }
 
-  std::cout << "players added\n";
+  // std::cout << "players added\n";
 
   for (int p = 0; p < players; p++) {
     Bot &bot = bots[p];
 
-    std::cout << std::format("SENDING:\n{} {}\n{}\n", N, ITER, players);
-    std::cout.flush();
+    // std::cout << std::format("SENDING:\n{} {}\n{}\n", N, ITER, players);
+    // std::cout.flush();
 
     bot.in << std::format("{} {}\n{}\n", N, ITER, players);
     bot.in << grush.players[p].base.to_string() + "\n";
@@ -45,14 +46,18 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::cout << "init info added" << std::endl;
+
+  // print initial position
+  std::cout << "INITIAL POSITION" << std::endl;
+  std::cout << grush.to_string() << std::endl;
+  system("sleep 0.1");
+  system("clear");
 
   for (int it = 0; it < ITER; it++) {
-    std::cout << it << " ITER" << std::endl;
-    system("sleep 0.01");
-    system("clear");
-    std::cout << grush.to_string() << std::endl;
+
     grush.update_vision();
+
+    GameStats stats;
 
     for (int p = 0; p < players; p++) {
 
@@ -60,30 +65,42 @@ int main(int argc, char *argv[]) {
       auto start = std::chrono::high_resolution_clock::now();
 
       Bot &bot = bots[p];
+      Player &player = grush.players[p];
 
-      bot.in << std::format("{}\n", grush.players[p].agents.size());
-      for (auto &agent : grush.players[p].agents) {
-        // std::cerr << "ARENA: to agent " << p << " => "<< agent.describe() << "\n";
-        bot.in << agent.describe() + "\n";
+      bot.in << player.agents.size() << "\n";
+      for (auto &agent : player.agents) {
+        // std::cerr << "ARENA: to agent " << p << " => "<< agent.describe() <<
+        // "\n";
+        bot.in << agent.describe() << "\n";
       }
       bot.in.flush();
 
-      for (auto &agent : grush.players[p].agents) {
+      for (auto &agent : player.agents) {
         std::string line;
-        std::getline(bot.out, line);
+        bot.out >> line;
+        // std::getline(bot.out, line);
         agent.action = parse(line);
-        // std::cout << agent.action << "\n";
+        // std::cout << "ARENA: agent action" << agent.action << "\n";
       }
 
       auto end = std::chrono::high_resolution_clock::now();
       auto duration =
-          std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+          std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-      std::cout << std::format("player {} on iter {}: {}ms\n", p, it,
-                               duration.count());
+      {
+        auto [r, c] = player.base;
+        size_t time = duration.count();
+        stats.push_back(
+            PlayerStats(time, grush.gold[r][c], (int)player.agents.size(), bot.command));
+      }
     }
 
     grush.update();
-    // std::cout << grush.to_string() << std::endl;
+
+    // print game state
+    std::cout << it << " ITER" << std::endl;
+    std::cout << grush.to_string(stats) << std::endl;
+    system("sleep 0.01");
+    if (it < ITER - 1) system("clear");
   }
 }

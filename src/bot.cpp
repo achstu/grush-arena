@@ -1,8 +1,12 @@
 #include "bot.hpp"
 
+#include <boost/process.hpp>
+#include <string>
+
+namespace bp = boost::process;
+
 Bot::Bot(const std::string &command)
-    : c(command, boost::process::std_in<in, boost::process::std_out> out) {
-  // c = bp::child(command, bp::std_in < in, bp::std_out > out);
+    : c(command, bp::std_in<in, bp::std_out> out), command(command) {
   // c = bp::child(command, bp::std_in < in, bp::std_out > out);
 }
 

@@ -1,21 +1,43 @@
-# remove asserts in release builds
-# CXXFLAGS := -DNDEBUG
-CXXFLAGS = $(shell cat compile_flags.txt)
-BOOST = $(shell nix-build --no-out-link '<nixpkgs>' -A boost.dev)
-BOOST_INCLUDE = -I$(BOOST)/include
+BUILD ?= debug
+
+CXXFLAGS := -Wall -Wextra -Wpedantic -std=c++20
+
+BOOST_PATH := $(shell nix-build --no-out-link '<nixpkgs>' -A boost.dev 2>/dev/null)
+ifneq ($(BOOST_PATH),)
+    BOOST_INCLUDE := -I$(BOOST_PATH)/include
+else
+    $(warning Boost not found via nix-build, trying system path)
+    BOOST_INCLUDE := -I/usr/include
+endif
+
+ifeq ($(BUILD),release)
+    CXXFLAGS += -O3 -DNDEBUG -flto
+    LDFLAGS := -flto
+else
+    CXXFLAGS += -O0 -g -DDEBUG
+endif
 
 CXX := g++
+TARGET := arena
+SOURCES := $(wildcard *.cpp)
+OBJECTS := $(SOURCES:.cpp=.o)
 
-default: arena
+# .PHONY: all debug release clean
 
-arena: main.o bot.o map.o
-	$(CXX) $^ -o $@
+all: $(TARGET)
 
-# bot.o: bot.hpp bot.cpp
-# $(CXX) $(CXXFLAGS) -I$(BOOSTLIB)/include -c bot.cpp -o bot.o
+debug: 
+	$(MAKE) BUILD=debug
+
+release:
+	$(MAKE) BUILD=release
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -I$(BOOST)/include -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(BOOST_INCLUDE) -c $< -o $@
 
-clear:
-	rm *.o
+clean:
+	rm -f *.o $(TARGET)
+
