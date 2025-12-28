@@ -1,2 +1,2 @@
--Wall -Wextra -Wpedantic -Wshadow
+-Wall -Wextra -Wpedantic
 -std=c++20

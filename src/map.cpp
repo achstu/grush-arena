@@ -46,7 +46,6 @@ Agent::Agent() {
   owner = 0; // TODO: owning player
 }
 
-
 static inline Position advance(Position p, Orientation o) {
   auto [r, c] = p;
   switch (o) {
@@ -92,16 +91,16 @@ Grush Grush::empty() {
   return grush;
 }
 
-void Grush::update(const std::vector<Turn> &turns) {
+void Grush::update() {
   // assert(turns.size() == players.size());
 
   // save input in agents
   // for (int p = 0; p < players.size(); p++) {
-    // assert(players[p].agents.size() == turns[p].size());
+  // assert(players[p].agents.size() == turns[p].size());
 
-    // for (int i = 0; i < turns[p].size(); i++) {
-      // players[p].agents[i].action = turns[p][i];
-    // }
+  // for (int i = 0; i < turns[p].size(); i++) {
+  // players[p].agents[i].action = turns[p][i];
+  // }
   // }
 
   for (int row = 0; row < N; row++) {
@@ -112,7 +111,7 @@ void Grush::update(const std::vector<Turn> &turns) {
   for (auto &player : players) {
     for (auto &agent : player.agents) {
       auto [r, c] = agent.position;
-      // assert(agents_ptr[r][c] != nullptr);
+      assert(agents_ptr[r][c] != nullptr);
       // assert(agents_ptr[r][c] == &agent);
     }
   }
@@ -147,7 +146,8 @@ void Grush::update(const std::vector<Turn> &turns) {
     for (auto &agent : player.agents) {
       // note: if action is other than specified above
       //       then identity rotation will be applied
-      agent.orientation = Orientation((agent.orientation + rotation(agent.action)) % 4);
+      agent.orientation =
+          Orientation((agent.orientation + rotation(agent.action)) % 4);
     }
   }
 
@@ -238,19 +238,14 @@ void Grush::update_vision() {
   }
 }
 
-void Grush::run() {
-  for (int it = 0; it < ITER; it++) {
-    update_vision();
-  }
-}
 
 std::string Grush::to_string() const {
   const static std::string colors[] = {
-    "\033[0;41m", // red
-    "\033[0;42m", // green
-    "\033[0;44m", // blue
-    "\033[0;45m", // magenta
-    
+      "\033[0;41m", // red
+      "\033[0;42m", // green
+      "\033[0;44m", // blue
+      "\033[0;45m", // magenta
+
   };
 
   const static std::string reset = "\033[0m";
@@ -260,18 +255,20 @@ std::string Grush::to_string() const {
   std::ostringstream ss;
   for (int row = 0; row < N; row++) {
     for (int col = 0; col < N; col++) {
-      if (square[row][col] == BLOCK) ss << wall_color;
-      else if (agents_ptr[row][col] != nullptr) ss << colors[agents_ptr[row][col]->owner];
-      else if (gold[row][col] > 0) ss << gold_color;
+      if (square[row][col] == BLOCK)
+        ss << wall_color;
+      else if (agents_ptr[row][col] != nullptr)
+        ss << colors[agents_ptr[row][col]->owner];
+      else if (gold[row][col] > 0)
+        ss << gold_color;
 
-      ss << "  " << reset; 
+      ss << "  " << reset;
     }
     ss << "\n";
   }
 
   return ss.str();
 }
-
 
 int manhattan_distance(Position a, Position b) {
   return std::abs(a.row - b.row) + std::abs(a.col - b.col);
@@ -283,43 +280,55 @@ Grush Grush::semi_random(int num_players, int num_agents) {
   Grush grush = Grush::empty();
 
   const static Position bases[] = {
-    {1, 1}, {N-2, N-2}, {1, N-2}, {N-2, 1}
-  };
+      {1, 1}, {N - 2, N - 2}, {1, N - 2}, {N - 2, 1}};
 
-  for (int row = 1; row < N-1; row++) {
-    for (int col = 1; col < N-1; col++) {
+  for (int row = 1; row < N - 1; row++) {
+    for (int col = 1; col < N - 1; col++) {
       bool skip = false;
       for (int i = 0; i < 4; i++) {
-        if (bases[i] == Position{row, col}) skip = true;
+        if (bases[i] == Position{row, col})
+          skip = true;
       }
-      if (skip) continue;
+      if (skip)
+        continue;
 
-      if (rand() % 100 == 0) grush.gold[row][col] += 100;
-      else if (rand() % 10 == 0) grush.square[row][col] = BLOCK;
+      if (rand() % 100 == 0)
+        grush.gold[row][col] += 100;
+      else if (rand() % 10 == 0)
+        grush.square[row][col] = BLOCK;
+    }
+  }
+
+  bool aaa[N][N];
+  for (int row = 1; row < N - 1; row++) {
+    for (int col = 1; col < N - 1; col++) {
+      aaa[row][col] = false;
     }
   }
 
   for (int p = 0; p < num_players; p++) {
     std::vector<Agent> agents;
-    
+
     for (int i = 0; i < num_agents; i++) {
       Agent a;
       a.owner = p;
       a.position = {0, 0};
-      while (grush.square[a.position.row][a.position.col] == BLOCK || manhattan_distance(bases[p], a.position) > 15) {
+      while (aaa[a.position.row][a.position.col] || grush.square[a.position.row][a.position.col] == BLOCK ||
+             manhattan_distance(bases[p], a.position) > 10) {
         a.position = {rand() % N, rand() % N};
       }
+      aaa[a.position.row][a.position.col] = true;
       agents.push_back(a);
     }
     grush.players.emplace_back(bases[p], agents);
   }
 
-  for (auto& player : grush.players) {
-    for (auto& agent : player.agents) {
+  for (auto &player : grush.players) {
+    for (auto &agent : player.agents) {
       auto [r, c] = agent.position;
       grush.agents_ptr[r][c] = &agent;
     }
   }
-  
+
   return grush;
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unistd.h>
 using namespace std;
 
 template <typename T, typename = T::value_type>
@@ -27,7 +28,9 @@ template <typename... Args> static void __print(const Args &...x) {
 
 #define debug(...)                                                             \
   do {                                                                         \
-    cerr << "BOT: ";                                                           \
+    pid_t pid = getpid();                                                      \
+                                                                               \
+    cerr << "BOT[" << pid << "]: ";                                            \
     cerr << '[' << #__VA_ARGS__ << "]:";                                       \
     __print(__VA_ARGS__);                                                      \
   } while (0)

@@ -12,7 +12,7 @@ enum Action {
 #include <iostream>
 
 static inline Action parse(const std::string& s) {
-  std::cerr << "CERR " << s << "|" << s.length() << "\n";
+  // std::cerr << "CERR " << s << "|" << s.length() << "\n";
 
   if (s == "LEFT") return LEFT;
   else if (s == "RIGHT") return RIGHT;

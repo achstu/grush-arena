@@ -1,6 +1,7 @@
 #include "process.hpp"
 #include <cassert>
 #include <cstdio>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <sys/types.h>
@@ -12,8 +13,10 @@ ChildProcess::ChildProcess(const std::string &command) {
   if (pipe(stdin_pipe) == -1 || pipe(stdout_pipe) == -1) {
     throw std::runtime_error("Pipe failed");
   }
+  std::cout << "afetr pipe " << command << std::endl;
 
   pid = fork();
+  std::cout << "after fork: pid=" << pid << "\n";
   if (pid == 0) {
     // child process
     dup2(stdin_pipe[0], STDIN_FILENO);

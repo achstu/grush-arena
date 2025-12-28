@@ -62,14 +62,9 @@ struct Grush {
   // Grush() = default;
   static Grush empty();
   static Grush semi_random(int num_players, int num_agents);
-  void update(const std::vector<Turn> &turns);
+  void update();
   void update_vision();
-  // static inline bool check_bounds(Position p) {
-    // auto [row, col] = p;
-    // return (0 <= row && row < N) && (0 <= col && col < N);
-  // }
   Vision calculate_vision(int, Position, Orientation);
-  void run();
 
   std::string to_string() const;
 };
