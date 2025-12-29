@@ -1,0 +1,9 @@
+*.o
+src/arena
+src/.cache
+src/compile_commands.json
+
+report/statistics.txt
+
+example/bot
+

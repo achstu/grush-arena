@@ -11,7 +11,11 @@ else
 endif
 
 ifeq ($(BUILD),release)
-    CXXFLAGS += -O3 -DNDEBUG -flto
+    CXXFLAGS += -O3 -DNDEBUG
+    CXXFLAGS += -march=native -mtune=native
+    CXXFLAGS += -D_GLIBCXX_USE_CXX11_ABI=1
+    CXXFLAGS += -fomit-frame-pointer -finline-functions
+    CXXFLAGS += -finline-limit=200 -funroll-loops -fpredictive-commoning
     LDFLAGS := -flto
 else
     CXXFLAGS += -O0 -g -DDEBUG

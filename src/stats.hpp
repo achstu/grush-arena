@@ -24,7 +24,7 @@ static inline void export_history(const History &h) {
   const static std::string color_names[] = {"red", "green", "blue", "magenta",
                                             "cyan"};
 
-  std::ofstream f("player_data");
+  std::ofstream f("../report/statistics.txt");
   for (int p = 0; p < (int)h[0].size(); p++) {
     f << color_names[p] << ' ';
   }
@@ -33,10 +33,9 @@ static inline void export_history(const History &h) {
   f << ITER << '\n';
 
   for (const auto& stats : h) {
-    for (const auto& p_stat : stats) {
-      f << p_stat.microseconds << ' ' << p_stat.alive_agents << ' ' << p_stat.gold;
+    for (const auto& p : stats) {
+      f << p.gold << ' ' << p.alive_agents << ' ' << p.microseconds<< '\n';
     }
-    f << '\n';
   }
   
   f.close();

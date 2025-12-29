@@ -11,6 +11,9 @@
 // #define clear()
 
 int main(int argc, char *argv[]) {
+  std::ios_base::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
 
   int players = argc - 1;
   assert(1 <= players && players <= 4);
@@ -104,4 +107,6 @@ int main(int argc, char *argv[]) {
 
     history.push_back(std::move(stats));
   }
+
+  export_history(history);
 }
