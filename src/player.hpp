@@ -52,7 +52,7 @@ private:
 public:
   Position base;
 
-  Player(Position b, std::vector<Agent> &&a);
+  Player(std::vector<Agent> &&a, Position b);
 
   auto alive_agents() { return std::ranges::filter_view(agents, is_alive); }
   auto alive_agents() const {

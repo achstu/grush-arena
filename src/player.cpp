@@ -2,7 +2,6 @@
 
 #include <format>
 #include <string>
-#include <ranges>
 
 bool Position::operator==(const Position &other) const {
   return (row == other.row) && (col == other.col);
@@ -55,8 +54,8 @@ std::string Agent::describe() const {
                      orientation_to_string(orientation), int(has_gold));
 }
 
-Player::Player(Position b, std::vector<Agent> &&a)
-    : base(b), agents(std::move(a)) {}
+Player::Player(std::vector<Agent> &&a, Position b)
+    : agents(std::move(a)), base(b) {}
 
 // static inline bool is_alive(const Agent &a) { return a.is_alive; }
 

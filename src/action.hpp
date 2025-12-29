@@ -1,15 +1,14 @@
 #pragma once
 
-#include <stdexcept>
+// #include <stdexcept>
 #include <string>
-#include <vector>
+#include <iostream>
 #include <cassert>
 
 enum Action {
   LEFT, RIGHT, BACK, GO, FIRE, MINE
 };
 
-#include <iostream>
 
 static inline Action parse(const std::string& s) {
   // std::cerr << "CERR " << s << "|" << s.length() << "\n";
@@ -34,5 +33,5 @@ static inline int rotation(Action action) {
   }
 }
 
-using Turn = std::vector<Action>;
+// using Turn = std::vector<Action>;
 

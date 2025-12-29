@@ -232,7 +232,7 @@ std::string Grush::to_string(const GameStats &stats) const {
       ss << bold;
       ss << stats[p].gold << "\t";
       ss << stats[p].alive_agents << "\t";
-      ss << stats[p].time << "us\t";
+      ss << stats[p].microseconds / 1'000 << "ms\t";
       ss << stats[p].command << "\t";
       ss << reset;
     }
@@ -298,7 +298,7 @@ Grush Grush::semi_random(int num_players, int num_agents) {
       agents.push_back(std::move(agent));
     }
 
-    grush.players.emplace_back(bases[p], std::move(agents));
+    grush.players.emplace_back(std::move(agents), bases[p]);
   }
 
   for (auto &player : grush.players) {

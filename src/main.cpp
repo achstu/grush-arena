@@ -7,12 +7,8 @@
 #include <string>
 #include <vector>
 
-#define CLEAR 1
-
-void clear() {
-  if (CLEAR)
-    system("clear");
-}
+#define clear() system("clear")
+// #define clear()
 
 int main(int argc, char *argv[]) {
 
@@ -55,6 +51,8 @@ int main(int argc, char *argv[]) {
   std::cout << grush.to_string() << std::endl;
   system("sleep 2");
   clear();
+
+  History history;
 
   for (int it = 0; it < ITER; it++) {
 
@@ -99,10 +97,11 @@ int main(int argc, char *argv[]) {
     grush.update();
 
     // print game state
-    if (it < ITER - 1)
-      clear();
+    clear();
     std::cout << it << " ITER" << std::endl;
     std::cout << grush.to_string(stats) << std::endl;
     system("sleep 0.01");
+
+    history.push_back(std::move(stats));
   }
 }
