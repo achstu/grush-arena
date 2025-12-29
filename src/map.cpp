@@ -229,30 +229,6 @@ std::string Grush::to_string(const GameStats &stats) const {
         // ss << "  ";
       }
     }
-
-    if (row == 0 && stats.size() == players.size()) {
-      ss << "\t";
-      ss << "Players\t\t";
-      ss << "Gold" << "\t";
-      ss << "Agents" << "\t";
-      ss << "Time" << "\t";
-      ss << "Program" << "\t";
-      ss << reset;
-    }
-
-    else if (stats.size() == players.size() && row - 1 < (int)players.size()) {
-      int p = row - 1;
-
-      ss << "\t";
-      ss << bold << colors_fg[p] << color_names[p] << reset << "\t\t";
-      // if (p != 3) ss << "\t";
-      ss << bold;
-      ss << stats[p].gold << "\t";
-      ss << stats[p].alive_agents << "\t";
-      ss << stats[p].microseconds / 1'000 << "ms\t";
-      ss << stats[p].command << "\t";
-      ss << reset;
-    }
     ss << "\n";
   }
 
