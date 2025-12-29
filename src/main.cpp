@@ -19,7 +19,8 @@ int main(int argc, char *argv[]) {
   assert(1 <= players && players <= 4);
 
   std::vector<Bot> bots;
-  Grush grush = Grush::semi_random(players, 15);
+  // Grush grush = Grush::semi_random(players, 15);
+  Grush grush = Grush::hand_crafted(players);
 
   for (int p = 0; p < players; p++) {
     std::string command = argv[p + 1];

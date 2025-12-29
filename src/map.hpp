@@ -16,6 +16,7 @@ struct Grush {
   std::vector<Player> players;
 
   Grush(); // empty map, no players
+  static Grush hand_crafted(int num_players);
   static Grush semi_random(int num_players, int num_agents);
   void update();
   void update_vision();

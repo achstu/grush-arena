@@ -1,9 +1,12 @@
 #include "map.hpp"
 #include "action.hpp"
+#include "bot.hpp"
+#include "player.hpp"
 #include "stats.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 #include <functional>
 #include <sstream>
 #include <vector>
@@ -182,7 +185,8 @@ std::string Grush::to_string(const GameStats &stats) const {
       "\033[0;36m", // cyan
   };
 
-  const static std::string color_names[] = {"red", "green", "blue", "magenta", "cyan"};
+  const static std::string color_names[] = {"red", "green", "blue", "magenta",
+                                            "cyan"};
 
   const static std::string reset = "\033[0m";
   const static std::string bold = "\033[1m";
@@ -193,13 +197,21 @@ std::string Grush::to_string(const GameStats &stats) const {
   std::ostringstream ss;
   for (int row = 0; row < N; row++) {
     for (int col = 0; col < N; col++) {
+
+      bool is_base = false;
+      for (const auto &p : players) {
+        if (p.base == Position{row, col}) {
+          is_base = true;
+        }
+      }
+
       if (square[row][col] == BLOCK) {
 
         ss << wall_color << "  " << reset;
 
       } else if (agents_ptr[row][col] != nullptr) {
         Agent *a = agents_ptr[row][col];
-        
+
         ss << colors[a->owner];
         ss << bold;
         ss << (a->has_gold ? "**" : "  ");
@@ -207,9 +219,14 @@ std::string Grush::to_string(const GameStats &stats) const {
 
       } else if (gold[row][col] > 0) {
 
-        ss << gold_color << "  " << reset;
+        ss << gold_color;
+        ss << (is_base ? "[]" : "  ");
+        ss << reset;
+
       } else {
-        ss << "  ";
+
+        ss << (is_base ? "[]" : "  ");
+        // ss << "  ";
       }
     }
 
@@ -237,6 +254,32 @@ std::string Grush::to_string(const GameStats &stats) const {
       ss << reset;
     }
     ss << "\n";
+  }
+
+  if (stats.size() == players.size()) {
+    ss << '\n';
+    ss << bold;
+    ss << "\t";
+    ss << "Players\t\t";
+    ss << "Gold" << "\t";
+    ss << "Agents" << "\t";
+    ss << "Time" << "\t";
+    ss << "Program" << "\t\n";
+    ss << reset;
+    ss << "\t===============================================\n";
+    for (int p = 0; p < (int)players.size(); p++) {
+
+      ss << "\t";
+      ss << bold << colors_fg[p] << color_names[p] << reset << "\t\t";
+      // if (p != 3) ss << "\t";
+      ss << bold;
+      ss << stats[p].gold << "\t";
+      ss << stats[p].alive_agents << "\t";
+      ss << stats[p].microseconds / 1'000 << "ms\t";
+      ss << stats[p].command << "\t";
+      ss << "\n";
+      ss << reset;
+    }
   }
 
   return ss.str();
@@ -299,6 +342,72 @@ Grush Grush::semi_random(int num_players, int num_agents) {
     }
 
     grush.players.emplace_back(std::move(agents), bases[p]);
+  }
+
+  for (auto &player : grush.players) {
+    for (auto &agent : player.alive_agents()) {
+      auto [r, c] = agent.position;
+      grush.agents_ptr[r][c] = &agent;
+    }
+  }
+
+  return grush;
+}
+
+Grush Grush::hand_crafted(int num_players) {
+  srand(time(nullptr));
+  const Position bases[] = {{3, 3}, {N - 4, N - 4}, {3, N - 4}, {N - 4, 3}};
+
+  Grush grush;
+
+  for (int p = 0; p < num_players; p++) {
+    std::vector<Agent> agents;
+    for (int row = bases[p].row - 1; row <= bases[p].row + 1; row++) {
+      for (int col = bases[p].col - 1; col <= bases[p].col + 1; col++) {
+        agents.emplace_back(Position{row, col}, Orientation(p), p);
+      }
+    }
+    grush.players.emplace_back(std::move(agents), bases[p]);
+  }
+
+  Position mod[] = {{+1, +1}, {-1, -1}, {+1, -1}, {-1, +1}};
+  for (int p = 0; p < num_players; p++) {
+    auto [r, c] = bases[p];
+    auto [a, b] = mod[p];
+    int d = 6;
+    grush.gold[r + d * a][c + d * b] = 5;
+  }
+
+  grush.gold[N / 2][N / 2] = 20;
+
+  grush.gold[N / 4][N / 2] = 10;
+  grush.gold[N / 2][N / 4] = 10;
+  grush.gold[3 * N / 4][N / 2] = 10;
+  grush.gold[N / 2][3 * N / 4] = 10;
+
+  for (int r = 1; r < N - 1; r++) {
+    for (int c = 1; c < N - 1; c++) {
+      bool ok = true;
+      for (int p = 0; p < num_players; p++) {
+        if (manhattan_distance(bases[p], Position{r, c}) < 7) {
+          ok = false;
+        }
+      }
+      if (!ok)
+        continue;
+
+      ok = (grush.gold[r][c] == 0);
+      for (Orientation o : {U, R, D, L}) {
+        Position p = {r, c};
+        auto [x, y] = p.advance(o);
+        if (grush.gold[x][y] != 0)
+          ok = false;
+      }
+
+      if (ok && rand() % 7 == 0) {
+        grush.square[r][c] = BLOCK;
+      }
+    }
   }
 
   for (auto &player : grush.players) {
