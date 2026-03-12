@@ -10,30 +10,33 @@ Grush is a turn-based strategy game where AI-controlled agents compete to collec
 Bots read game state from standard input and output their actions, allowing implementation in any programming language. The arena handles game logic, enforces rules, and provides visual feedback through a simple text-based output.
 
 ## Creating Your Own Bot
-- Read the complete Game Rules to understand the protocol
+- Read the complete [Game Rules](./RULES.md) to understand the protocol
 - Implement your strategy in any language that can read from stdin and write to stdout
 - Test against the example bots
 
 ## Building
 
-+ Prerequisites
+1. Prerequisites
+
 - C++20 compatible compiler
 - Boost C++ Library
 - Make build system
 
-+ Clone the repository
+2. Clone the repository
+
 ```bash
 git clone https://github.com/achstu/grush-arena.git
 cd grush
 ```
 
-+ Compile arena program and example bot
+3. Compile arena program and example bot
+
 ```bash
 make -C src/
 make -C example/
 ```
+4. Run with
 
-+ Run with
 ```bash
 ./src/arena ./example/bot ./example/bot.py
 ```
