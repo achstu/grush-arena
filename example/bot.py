@@ -1,5 +1,6 @@
-import sys
 import random
+
+print("bot.py", flush=True)
 
 board_size, turns = map(int, input().split())
 
@@ -12,7 +13,7 @@ for _ in range(turns):
     agents = int(input())
 
     for _ in range(agents):
-        row, col, object, dist, rot = input().split()
+        row, col, object, dist, rot, has_gold = input().split()
 
     for _ in range(agents):
         actions = ["FIRE", "GO", "MINE", "LEFT", "RIGHT", "BACK"]

@@ -12,7 +12,7 @@ using namespace std;
 
 
 int main() {
-  cout << "random" << endl;
+  cout << "bot.cpp" << endl;
 
   
   // vector<string> actions = {"FIRE", "GO", "MINE", "LEFT", "RIGHT", "BACK"};
